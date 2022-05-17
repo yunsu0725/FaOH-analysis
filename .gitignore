@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Mac relevant
+*.DS_Store
+
+# Editor relevant
+*.swp
+.vscode/
+.idea/
+
+# output res
+res/*.xlsx
