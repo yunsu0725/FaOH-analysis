@@ -137,4 +137,8 @@ dmypy.json
 .idea/
 
 # output res
-res/*.xlsx
+res/**/*.xlsx
+
+# exp data
+data/**/*.TXT
+data/**/*.txt

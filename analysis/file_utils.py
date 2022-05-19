@@ -1,7 +1,49 @@
 import os
 import re
+from pathlib import Path
+import io
+import yaml
 
-def get_all_txt_files(target_dir):
-    all_files = os.listdir(target_dir)
-    txt_files = [x for x in all_files if re.match(r'.*\.txt', x)]
+
+def get_main_dir():
+    return Path('.')
+
+
+class ConfigManager:
+    def __init__(self, config_path: Path) -> None:
+        with io.open(config_path, 'r') as f:
+            self.configs = yaml.safe_load(f)
+
+    def _get_config(self, key: str):
+        try:
+            res = self.configs[key]
+            return res
+        except KeyError:
+            print(f'please specify key: {key} in the yaml file.')
+        return None
+
+    def get_data_dir(self) -> Path:
+        exp_data_dir = self._get_config('data_dir')
+        if exp_data_dir is None:
+            return None
+        return get_main_dir() / 'data' / exp_data_dir
+
+    def get_result_file_path(self) -> Path:
+        target_file = self._get_config('target_file')
+        if target_file is None:
+            return None
+        return get_main_dir() / 'res' / target_file
+
+    def get_retention_times(self):
+        return self._get_config('retention_times')
+
+
+def get_all_txt_files(data_dir: Path):
+    all_files = os.listdir(data_dir)
+    txt_files = [x for x in all_files if re.match(r'.*\.TXT', x)]
     return txt_files
+
+
+def get_vial_names():
+    txt_files = get_all_txt_files()
+    return [x[:-4] for x in txt_files]

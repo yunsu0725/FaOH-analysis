@@ -1,6 +1,8 @@
-from sys import argv
 import xlsxwriter
 import os
+from analysis.file_utils import ConfigManager, get_all_txt_files
+from analysis.sheet_manager import SheetManager
+from pathlib import Path
 
 
 def ExcelWriteRow(file_path, work_sheet, row):
@@ -40,9 +42,9 @@ def WriteJohnCodeToXlsx(data_dir: str, file_path):
     row = 0
     for _, _, files in os.walk(data_dir):
         for file in files:
+            print(f'file: {file}')
             x = file.split('.')
             if len(x) > 1 and x[1].upper() == 'TXT':
                 file_path = data_dir / file
                 row = ExcelWriteRow(file_path, work_sheet, row)
     workbook.close()
-

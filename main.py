@@ -1,33 +1,12 @@
-from ast import Load
-from json import load
-import yaml
-import io
 from analysis.join_code import WriteJohnCodeToXlsx
+from analysis.file_utils import ConfigManager
 from pathlib import Path
 
-pwd = Path('.')
+from analysis.sheet_manager import SheetManager
 
-def get_res_dir():
-    return pwd / 'res'
-    
-def get_data_dir():
-    return pwd / 'data'
-
-def load_configs():
-    with io.open('exp.yml', 'r') as f:
-        data_loaded = yaml.safe_load(f)
-    return data_loaded
-    
 
 if __name__ == '__main__':
-    configs = load_configs()
-    print(f'configs: {configs}')
-    try:
-        target_file_name = configs['target_file']
-        # data_dir = configs['data_dir']
-        data_dir = get_data_dir()
-        target_file_path = get_res_dir() / target_file_name
-        WriteJohnCodeToXlsx(data_dir, target_file_path)
-    except KeyError as e:
-        print(f'fail to get key: {e}')
-        
+    configManager = ConfigManager(Path('./exp.yml'))
+    # WriteJohnCodeToXlsx(configManager.get_data_dir(), configManager.get_result_file_path())
+    rt = configManager.get_retention_times()
+    print(f'retention_times: {rt}')

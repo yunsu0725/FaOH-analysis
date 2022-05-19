@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 xlsxwriter = "3.0.3"
 pyyaml = "6.0"
+pandas = "1.4.2"
 
 [dev-packages]
 autopep8 = "1.6.0"

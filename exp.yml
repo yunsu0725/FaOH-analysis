@@ -1,2 +1,19 @@
-data_dir: data
-target_file: 'test.xlsx'
+data_dir: example
+target_file: "test.xlsx"
+retention_times:
+  C3: 4.080
+  C4: 7.645
+  C5: 12.622
+  C6: 14.802
+  C7: 16.310
+  C8: 17.613
+  C9: 18.648
+  C10: 19.667
+  C11: 20.660
+  C12: 21.550
+  C13: 22.340
+  C14: 23.170
+  C15: 23.920
+  C16: 24.709
+  C17: 25.464
+  C18: 26.127
