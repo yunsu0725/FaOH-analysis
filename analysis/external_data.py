@@ -99,3 +99,4 @@ def calc_external_standards(sheet_manager: SheetManager, analytes):
     # e.g. FAOH-100 or FAME-2000
     alc_acid_ID = 'FaOH'
     getExternalStdData(sheet_manager, standards_used, alc_acid_ID)
+    sheet_manager.save_workbook()

@@ -46,6 +46,12 @@ class SheetManager:
 
     def load_quant_full_sheet(self):
         return self.wb[self.quant_full_key]
+        
+    def drop_tmp_sheets(self):
+        # it is a tmp workaround to drop the quant full sheet
+        # we shd remove that sheet from the logic itself for long term if have time
+        del self.wb[self.quant_full_key]
+        self.save_workbook()
 
     def save_workbook(self):
         self.wb.save(self.file_path)

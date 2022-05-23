@@ -80,8 +80,7 @@ def calc_quant_sheet(sheet_manager: SheetManager):
     for row in quant_sheet_list:
         quant_sheet.append(row)
 
-    # Notice that this code may not work as intended if there is a duplicate in the first row,
-    # however, since the first row will always be a sample name, it is fine.
+    sheet_manager.save_workbook()
 
 
 def calc_quant_full(sheet_manager: SheetManager, analytes):
@@ -101,7 +100,6 @@ def calc_quant_full(sheet_manager: SheetManager, analytes):
                 blank_row = [0, 0, 0, 0, 0, a]
                 quant_full_sheet.append(blank_row)
 
-    print(f'{quant_full_sheet.max_row=}')
     quant_sheet = sheet_manager.load_quant_sheet()
     fat_ass = True
     last_count = 1
@@ -133,3 +131,5 @@ def calc_quant_full(sheet_manager: SheetManager, analytes):
                 break
             else:
                 continue
+
+    sheet_manager.save_workbook()
