@@ -1,5 +1,4 @@
 from pathlib import Path
-from xlsxwriter import Workbook
 import openpyxl
 
 
@@ -8,19 +7,17 @@ class SheetManager:
         self.file_path = file_path
         self.john_code_key = 'John_Code'
         self.peak_id_key = 'Peak_ID'
+        self.wb = openpyxl.Workbook()
 
     def create(self):
-        wb = Workbook(self.file_path)
-        wb.add_worksheet(self.john_code_key)
-        wb.add_worksheet(self.peak_id_key)
-
-    def load_workbook(self) -> Workbook:
-        return openpyxl.load_workbook(self.file_path)
+        self.wb.create_sheet(title=self.john_code_key)
+        self.wb.create_sheet(title=self.peak_id_key)
 
     def load_john_code_sheet(self):
-        wb = self.load_workbook()
-        return wb[self.john_code_key]
+        return self.wb[self.john_code_key]
 
     def load_peak_id_sheet(self):
-        wb = self.load_workbook()
-        return wb[self.peak_id_key]
+        return self.wb[self.peak_id_key]
+
+    def save_workbook(self):
+        self.wb.save(self.file_path)
