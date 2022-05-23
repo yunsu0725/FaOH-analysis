@@ -1,5 +1,6 @@
 from pathlib import Path
 import openpyxl
+import pandas as pd
 
 
 class SheetManager:
@@ -15,6 +16,11 @@ class SheetManager:
 
     def load_john_code_sheet(self):
         return self.wb[self.john_code_key]
+    
+    def load_john_code_data_frames(self):
+        df = pd.read_excel(self.file_path, sheet_name=self.john_code_key, header=None)
+        return df
+        
 
     def load_peak_id_sheet(self):
         return self.wb[self.peak_id_key]
