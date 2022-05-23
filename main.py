@@ -1,5 +1,5 @@
 from analysis.join_code import WriteJohnCodeToXlsx
-from analysis.peak import pick_peak
+from analysis.peak import calc_quant_full, calc_quant_sheet, pick_peak
 from analysis.file_utils import ConfigManager
 from pathlib import Path
 
@@ -15,4 +15,6 @@ if __name__ == '__main__':
     rt = configManager.get_retention_times()
     print(f'{rt=}')
     pick_peak(rt, sheet_manager, data_dir)
+    calc_quant_sheet(sheet_manager)
+    calc_quant_full(sheet_manager, rt.keys())
     sheet_manager.save_workbook()

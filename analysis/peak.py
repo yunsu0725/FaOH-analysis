@@ -59,108 +59,80 @@ def pick_peak(RT_dict: dict, sheet_manager: SheetManager, data_dir: Path):
                     work_sheet.append(vals[1:])
 
 
-def bala():
-    wb = openpyxl.load_workbook(filename)
-    sheet2 = ''
-    sheet2 = wb['Peak_ID']
-    sheet3 = ''
+def calc_quant_sheet(sheet_manager: SheetManager):
+    peak_id_sheet = sheet_manager.load_peak_id_sheet()
+    quant_sheet = sheet_manager.load_quant_sheet()
+    cur_peak_id, cur_area = None, None
+    def get_area(r): return r[3]
+    def get_peak_id(r): return r[5]
 
-    sheet3 = wb.create_sheet('Quantification w IS,ES')
+    quant_sheet_list = []
+    # iterates through a semi-arbitrary number of rows and only reports values, still a tuple
+    for row in peak_id_sheet.iter_rows(min_row=1, max_row=5000, min_col=1, max_col=10, values_only=True):
 
-    ID = 'blank'
-    Area = 'blank'
-    sheet3_list = []
-
-# iterates through a semi-arbitrary number of rows and only reports values, still a tuple
-    for row in sheet2.iter_rows(min_row=1, max_row=5000, min_col=1, max_col=10, values_only=True):
-
-        if row[5] == ID:  # If there is a duplicate label for a single peak, pick the peak with the larger area
-            if row[3] > Area:
-                sheet3_list.pop()
-                sheet3_list.append(row)
+        if get_peak_id(row) == cur_peak_id:
+            # If there is a duplicate label for a single peak,
+            # pick the peak with the larger area
+            if get_area(row) > cur_area:
+                quant_sheet_list.pop()
+                quant_sheet_list.append(row)
             else:
                 continue
-
         else:
-            sheet3_list.append(row)
+            quant_sheet_list.append(row)
 
-        if row[3] == None:  # breaks out of for loop once all text file data is iterated through
+        # breaks out of for loop once all text file data is iterated through
+        if get_area(row) is None:
             break
+        cur_peak_id, cur_area = get_peak_id(row), get_area(row)
 
-        else:
-            ID = row[5]
-            Area = row[3]
+    for row in quant_sheet_list:
+        quant_sheet.append(row)
 
-    for row in sheet3_list:
-        sheet3.append(row)
+    # Notice that this code may not work as intended if there is a duplicate in the first row,
+    # however, since the first row will always be a sample name, it is fine.
 
-# Notice that this code may not work as intended if there is a duplicate in the first row, however, since the first row will always be a sample name, it is fine.
 
-    wb.save(filename)
-
-    wb = openpyxl.load_workbook(filename)
-    sheet_read = ''
-    sheet_read = wb['Peak_ID']
-    sheet3 = ''
-    sheet3 = wb.create_sheet('Quantification w IS,ES-full')
-
+def calc_quant_full(sheet_manager: SheetManager, analytes):
+    sheet_read = sheet_manager.load_peak_id_sheet()
+    quant_full_sheet = sheet_manager.load_quant_full_sheet()
     sample_header = []
     data_header = ['R.time', 'I.time', 'F.time', 'Area', 'Height', 'Peak_ID']
 
-# iterates through a semi-arbitrary number of rows and only reports values, still a tuple
+    # iterates through a semi-arbitrary number of rows and only reports values, still a tuple
     for row in sheet_read.iter_rows(min_row=1, max_row=sheet_read.max_row, min_col=1, max_col=10, values_only=True):
         # This is a bit clunky, but it ensures the order of the samples in the Peak_ID tab is maintained
-        if row[0] == row[1] and row[1] == row[2]:
+        if row[0] is not None and row[0] == row[1]  == row[2]:
             sample = row[0]
             sample_header = [sample, sample, sample, sample, sample, sample]
-            sheet3.append(sample_header)
-            sheet3.append(data_header)
+            quant_full_sheet.append(sample_header)
+            quant_full_sheet.append(data_header)
             for a in analytes:
                 blank_row = [0, 0, 0, 0, 0, a]
-                sheet3.append(blank_row)
+                quant_full_sheet.append(blank_row)
 
-    print(sheet3.max_row)
-
-
-#wb = openpyxl.load_workbook('GCData-JGI_ACRs.xlsx')
-    sheet2 = ''
-    sheet2 = wb['Quantification w IS,ES']
-    sheet3 = ''
-    sheet3 = wb['Quantification w IS,ES-full']
-
-    Ass_Fat = True
+    print(f'{quant_full_sheet.max_row=}')
+    quant_sheet = sheet_manager.load_quant_sheet()
+    fat_ass = True
     last_count = 1
-    while Ass_Fat:
-
+    while fat_ass:
         counter = 0
-
-        for row2, row3 in zip(sheet2.iter_rows(min_row=1, max_row=sheet3.max_row, min_col=1, max_col=10, values_only=True), sheet3.iter_rows(min_row=1, max_row=sheet3.max_row, min_col=1, max_col=10, values_only=True)):
-            #print(row1[0], row2[0])
+        for row2, row3 in zip(quant_sheet.iter_rows(min_row=1, max_row=quant_full_sheet.max_row, min_col=1, max_col=10, values_only=True), quant_full_sheet.iter_rows(min_row=1, max_row=quant_full_sheet.max_row, min_col=1, max_col=10, values_only=True)):
             counter = counter + 1
-            # print(counter)
             if counter < last_count:
                 continue
             elif row2[5] == row3[5]:
                 last_count = counter
-                print(last_count)
             elif row2[5] != row3[5]:
-                # print(row3[5])
-                sheet2.insert_rows(counter)
-                sheet2.cell(row=counter, column=6).value = row3[5]
-                sheet2.cell(row=counter, column=5).value = 0.000000001
-                #last_count = counter
+                quant_sheet.insert_rows(counter)
+                quant_sheet.cell(row=counter, column=6).value = row3[5]
+                quant_sheet.cell(row=counter, column=5).value = 0.000000001
                 break
 
-            if counter == sheet3.max_row:
-                Ass_Fat = False
+            if counter == quant_full_sheet.max_row:
+                fat_ass = False
                 break
             else:
                 continue
 
-
-#wb.remove_sheet('Quantification w IS,ES-full')
-    wb.save(filename)
-
-# useless
-    for i, j in zip([1, 2, 3], [3, 2, 1]):
-        print(i, j)
+    #wb.remove_sheet('Quantification w IS,ES-full')
