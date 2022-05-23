@@ -44,6 +44,5 @@ def get_all_txt_files(data_dir: Path):
     return txt_files
 
 
-def get_vial_names():
-    txt_files = get_all_txt_files()
-    return [x[:-4] for x in txt_files]
+def get_vial_names(all_txt_files):
+    return [x[:-4] for x in all_txt_files]

@@ -1,22 +1,21 @@
-import xlsxwriter
-import os
-from analysis.file_utils import ConfigManager, get_all_txt_files
+from analysis.file_utils import get_all_txt_files
 from analysis.sheet_manager import SheetManager
-from pathlib import Path
 
 
+# TODO: simplify
 def ExcelWriteRow(file_path, work_sheet, row):
     with open(file_path, 'r') as in_file:
-        col = 0
+        col = 1
         flag = False
         for line in in_file:
             columns = line.split()
             if len(columns) == 3 or len(columns) == 4:
                 if columns[0] == 'Sample' and columns[1] == 'Name':
                     if len(columns) < 4:
-                        work_sheet.write(row, col, columns[2])
+                        work_sheet.cell(row=row, column=col, value=columns[2])
                     else:
-                        work_sheet.write(row, col, columns[2]+columns[3])
+                        work_sheet.cell(row=row, column=col,
+                                        value=columns[2]+columns[3])
             if len(columns) > 1:
                 if columns[0] == 'Peak#':
                     flag = True
@@ -25,26 +24,24 @@ def ExcelWriteRow(file_path, work_sheet, row):
                 if len(columns) > 1:
                     row = row+1
                     # print(line)
-                    for col in range(6):
+                    for c in range(6):
                         try:
-                            work_sheet.write(row, col, float(columns[col]))
+                            work_sheet.cell(row=row, column=c+1,
+                                            value=float(columns[c]))
                         except ValueError:
-                            work_sheet.write(row, col, columns[col])
+                            work_sheet.cell(row=row, column=c +
+                                            1, value=columns[c])
                 else:
                     break
 
     return row+2
 
 
-def WriteJohnCodeToXlsx(data_dir: str, file_path):
-    workbook = xlsxwriter.Workbook(file_path)
-    work_sheet = workbook.add_worksheet('John_Code')
-    row = 0
-    for _, _, files in os.walk(data_dir):
-        for file in files:
-            print(f'file: {file}')
-            x = file.split('.')
-            if len(x) > 1 and x[1].upper() == 'TXT':
-                file_path = data_dir / file
-                row = ExcelWriteRow(file_path, work_sheet, row)
-    workbook.close()
+def WriteJohnCodeToXlsx(data_dir: str, sheet_manager: SheetManager):
+    work_sheet = sheet_manager.load_john_code_sheet()
+    all_txt_files = get_all_txt_files(data_dir)
+    row = 1
+    for file in all_txt_files:
+        print(f'{file=}')
+        file_path = data_dir / file
+        row = ExcelWriteRow(file_path, work_sheet, row)
