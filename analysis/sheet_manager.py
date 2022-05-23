@@ -18,6 +18,7 @@ class SheetManager:
         self.wb.create_sheet(title=self.peak_id_key)
         self.wb.create_sheet(title=self.quant_key)
         self.wb.create_sheet(title=self.quant_full_key)
+        self.wb.create_sheet(title=self.external_standard_key)
         del self.wb['Sheet']
 
     def load_john_code_sheet(self):
