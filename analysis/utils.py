@@ -9,6 +9,14 @@ def get_main_dir():
     return Path('.')
 
 
+def get_area_from_row(r):
+    return r[3]
+
+
+def get_peak_id_from_row(r):
+    return r[5]
+
+
 class ConfigManager:
     def __init__(self, config_path: Path) -> None:
         with io.open(config_path, 'r') as f:

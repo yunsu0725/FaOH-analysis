@@ -10,6 +10,7 @@ class SheetManager:
         self.peak_id_key = 'Peak_ID'
         self.quant_key = 'Quantification w IS,ES'
         self.quant_full_key = 'Quantification w IS,ES-full'
+        self.external_standard_key = 'EXT_STD'
         self.wb = openpyxl.Workbook()
 
     def create(self):
@@ -28,8 +29,17 @@ class SheetManager:
         )
         return df
 
+    def load_quant_sheet_data_frame(self, use_cols):
+        df = pd.read_excel(
+            self.file_path, sheet_name=self.quant_key, header=None, usecols=use_cols
+        )
+        return df
+
     def load_peak_id_sheet(self):
         return self.wb[self.peak_id_key]
+        
+    def load_external_standard_sheet(self):
+        return self.wb[self.external_standard_key]
 
     def load_quant_sheet(self):
         return self.wb[self.quant_key]

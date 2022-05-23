@@ -1,4 +1,4 @@
-from analysis.file_utils import get_all_txt_files
+from analysis.utils import get_all_txt_files
 from analysis.sheet_manager import SheetManager
 
 
@@ -45,3 +45,4 @@ def WriteJohnCodeToXlsx(data_dir: str, sheet_manager: SheetManager):
         print(f'{file=}')
         file_path = data_dir / file
         row = ExcelWriteRow(file_path, work_sheet, row)
+    sheet_manager.save_workbook()
