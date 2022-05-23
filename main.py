@@ -3,6 +3,7 @@ from analysis.peak import calc_quant_full, calc_quant_sheet, pick_peak
 from analysis.utils import ConfigManager
 from analysis.external_data import calc_external_standards
 from analysis.sheet_manager import SheetManager
+from analysis.concentrate import calc_and_concentrate_data
 from pathlib import Path
 
 
@@ -18,4 +19,5 @@ if __name__ == '__main__':
     calc_quant_sheet(sheet_manager)
     calc_quant_full(sheet_manager, analytes)
     calc_external_standards(sheet_manager, analytes)
+    calc_and_concentrate_data(sheet_manager)
     sheet_manager.drop_tmp_sheets()
