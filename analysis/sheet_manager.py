@@ -1,8 +1,9 @@
 from pathlib import Path
+from typing import Callable
 import openpyxl
 import pandas as pd
 
-from analysis.data_point import DataPoint
+from analysis.data_point import DataPoint, pad_missing_chain
 
 
 class SheetManager:
@@ -68,13 +69,32 @@ class SheetManager:
         sheet = self.load_raw_sheet()
         headers = DataPoint.get_raw_data_sheet_header()
         for vial in vials:
-            # repeat the vial for len(headers) times
             try:
                 data_points = dp_dict[vial]
                 sheet.append([vial])
                 sheet.append(headers)
                 for dp in data_points:
                     sheet.append(dp.get_raw_data_row())
+            except KeyError:
+                # TODO: error logger
+                pass
+
+    def write_quantification_sheet(
+        self,
+        dp_dict: dict[str, list[DataPoint]],
+        vials: list[str],
+        analytes: list[str],
+    ):
+        sheet = self.load_quant_sheet()
+        headers = DataPoint.get_quantification_sheet_header()
+        for vial in vials:
+            try:
+                data_points = dp_dict[vial]
+                sheet.append([vial])
+                sheet.append(headers)
+                pad_dps = pad_missing_chain(data_points, analytes)
+                for dp in pad_dps:
+                    sheet.append(dp.get_quantification_sheet_row())
             except KeyError:
                 # TODO: error logger
                 pass

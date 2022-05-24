@@ -24,11 +24,12 @@ def new_flow():
     analytes = rt.keys()
 
     peak_dp = pick_peak_from_data_points(data_points, rt, analytes, vial_names)
-    for key, dps in peak_dp.items():
-        print(f'{key=}')
-        for dp in dps:
-            print(f'  {dp=}')
+    # for key, dps in peak_dp.items():
+    #     print(f'{key=}')
+    #     for dp in dps:
+    #         print(f'  {dp=}')
             
+    sheet_manager.write_quantification_sheet(peak_dp, vial_names, analytes)
     sheet_manager.save_workbook()
 
 
