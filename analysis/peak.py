@@ -1,4 +1,4 @@
-from analysis.raw_data_parser import DataPoint
+from analysis.data_point import DataPoint
 from analysis.sheet_manager import SheetManager
 from pathlib import Path
 import analysis.utils as utils

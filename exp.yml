@@ -1,5 +1,5 @@
 data_dir: example
-target_file: "bobo.xlsx"
+target_file: "new_test.xlsx"
 retention_times:
   C3: 4.080
   C4: 7.645

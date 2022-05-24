@@ -12,21 +12,24 @@ def new_flow():
     sheet_manager = SheetManager(configManager.get_result_file_path())
     sheet_manager.create()
     data_dir = configManager.get_data_dir()
+    all_txt_files = get_all_txt_files(data_dir)
+    vial_names = get_vial_names(all_txt_files)
+
     process_raw_data(data_dir, sheet_manager)
     data_points = parse_data_points_from_raw_txt(data_dir)
     # print(f'{data_points=}')
+    sheet_manager.write_raw_data_points(data_points, vial_names)
 
     rt = configManager.get_retention_times()
     analytes = rt.keys()
-
-    all_txt_files = get_all_txt_files(data_dir)
-    vial_names = get_vial_names(all_txt_files)
 
     peak_dp = pick_peak_from_data_points(data_points, rt, analytes, vial_names)
     for key, dps in peak_dp.items():
         print(f'{key=}')
         for dp in dps:
             print(f'  {dp=}')
+            
+    sheet_manager.save_workbook()
 
 
 def cur_flow():

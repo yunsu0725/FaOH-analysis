@@ -1,17 +1,6 @@
 from analysis.utils import get_all_txt_files
 from analysis.sheet_manager import SheetManager
-from dataclasses import dataclass
-
-
-@dataclass
-class DataPoint:
-    peak_id: int
-    r_time: float
-    i_time: float
-    f_time: float
-    area: float
-    height: float
-    chain_name: str = None  # it is unknown while reading from the txt files
+from analysis.data_point import DataPoint
 
 
 def extract_rows_from_file(file_path, work_sheet, row):
