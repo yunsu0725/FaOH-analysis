@@ -47,7 +47,24 @@ def process_raw_data(data_dir: str, sheet_manager: SheetManager):
     sheet_manager.save_workbook()
 
 
-# the rewritten version without operating the sheet
+def parse_data_point_from_columns(columns: list) -> DataPoint:
+    # Row format recorded in the txt files is as below
+    # Peak#	R.Time	I.Time	F.Time	Area	Height
+    try:
+        dp = DataPoint(
+            peak_id=int(columns[0]),
+            r_time=float(columns[1]),
+            i_time=float(columns[2]),
+            f_time=float(columns[3]),
+            area=float(columns[4]),
+            height=float(columns[5]),
+        )
+        return dp
+    except (IndexError, ValueError):
+        # TODO: error logger
+        return None
+
+
 def parse_data_points_from_raw_txt(data_dir: str) -> dict:
     all_txt_files = get_all_txt_files(data_dir)
     res = dict()
@@ -55,9 +72,8 @@ def parse_data_points_from_raw_txt(data_dir: str) -> dict:
         file_path = data_dir / file
         reading_peak_table = False
         with open(file=file_path, mode='r') as f:
-            data_points = []
-            chain_name = None
-            for line in f.readlines():
+            data_points, chain_name = [], None
+            for line in f:
                 columns = line.split()
                 if line.startswith('Sample Name'):
                     # there should be a line with format like 'Sample Name CM24-A'
@@ -65,25 +81,14 @@ def parse_data_points_from_raw_txt(data_dir: str) -> dict:
                     # after the prefix, as there might be blanks, we concat the columns left
                     chain_name = ''.join(columns[2:])
                     res[chain_name] = list()
-
-                if line.startswith('Peak#'):
+                elif line.startswith('Peak#'):
                     reading_peak_table = True
                     continue
 
-                # Row format recorded in the txt files is as below
-                # Peak#	R.Time	I.Time	F.Time	Area	Height
                 if reading_peak_table:
                     if len(columns) > 1:
-                        data_points.append(
-                            DataPoint(
-                                peak_id=int(columns[0]),
-                                r_time=float(columns[1]),
-                                i_time=float(columns[2]),
-                                f_time=float(columns[3]),
-                                area=float(columns[4]),
-                                height=float(columns[5]),
-                            )
-                        )
+                        if (dp := parse_data_point_from_columns(columns)) and dp is not None:
+                            data_points.append(dp)
                     else:
                         # the blank line separte the peak table and the following blocks
                         # we can break here since we only care about the peak table

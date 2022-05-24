@@ -65,9 +65,8 @@ class SheetManager:
         self.save_workbook()
 
     def write_raw_data_points(self, dp_dict: dict[str, list[DataPoint]], vials: list[str]):
-        # TODO: move headers to the class methods of data point
         sheet = self.load_raw_sheet()
-        headers = ['Peak#', 'R.Time', 'I.Time', 'F.Time', 'Area', 'Height']
+        headers = DataPoint.get_raw_data_sheet_header()
         for vial in vials:
             # repeat the vial for len(headers) times
             try:
