@@ -6,7 +6,7 @@ import pandas as pd
 class SheetManager:
     def __init__(self, file_path: Path) -> None:
         self.file_path = file_path
-        self.john_code_key = 'John_Code'
+        self.preprocess_key = 'Preprocessed Data'
         self.peak_id_key = 'Peak_ID'
         self.quant_key = 'Quantification w IS,ES'
         self.quant_full_key = 'Quantification w IS,ES-full'
@@ -15,7 +15,7 @@ class SheetManager:
         self.wb = openpyxl.Workbook()
 
     def create(self):
-        self.wb.create_sheet(title=self.john_code_key)
+        self.wb.create_sheet(title=self.preprocess_key)
         self.wb.create_sheet(title=self.peak_id_key)
         self.wb.create_sheet(title=self.quant_key)
         self.wb.create_sheet(title=self.quant_full_key)
@@ -23,12 +23,12 @@ class SheetManager:
         self.wb.create_sheet(title=self.concentration_key)
         del self.wb['Sheet']
 
-    def load_john_code_sheet(self):
-        return self.wb[self.john_code_key]
+    def load_raw_sheet(self):
+        return self.wb[self.preprocess_key]
 
-    def load_john_code_data_frames(self):
+    def load_raw_data_frames(self):
         df = pd.read_excel(
-            self.file_path, sheet_name=self.john_code_key, header=None
+            self.file_path, sheet_name=self.preprocess_key, header=None
         )
         return df
 

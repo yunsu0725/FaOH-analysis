@@ -3,16 +3,13 @@ from pathlib import Path
 import analysis.utils as utils
 
 
-def pick_peak(RT_dict: dict, sheet_manager: SheetManager, data_dir: Path):
+def pick_peak(data_dir: Path, sheet_manager: SheetManager, rt: dict, analytes):
     work_sheet = sheet_manager.load_peak_id_sheet()
-    df = sheet_manager.load_john_code_data_frames()
+    df = sheet_manager.load_raw_data_frames()
     # Preparing list of strings called Vial_names where each element is the name of a sample
     txt_files = utils.get_all_txt_files(data_dir)
     Vial_names = utils.get_vial_names(txt_files)
     # Create list of analytes to make it easy to call dictionary in future
-    analytes = RT_dict.keys()
-
-    # This block goes through the dataframe from the John_Code sheet and picks out sample names and relevant peaks.
     txt_file_headers = ['R.time', 'I.time',
                         'F.time', 'Area', 'Height', 'Peak_ID']
 
@@ -42,8 +39,8 @@ def pick_peak(RT_dict: dict, sheet_manager: SheetManager, data_dir: Path):
 
         if x == float and sample_of_interest == 'yes':
             for a in analytes:
-                upper_tolerance = RT_dict[a] + 0.1
-                lower_tolerance = RT_dict[a] - 0.1
+                upper_tolerance = rt[a] + 0.1
+                lower_tolerance = rt[a] - 0.1
                 if vals[1] < upper_tolerance and vals[1] > lower_tolerance:
                     vals.append(a)
                     work_sheet.append(vals[1:])

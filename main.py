@@ -1,4 +1,4 @@
-from analysis.john_code import calc_john_code
+from analysis.raw_data_parser import process_raw_data, parse_data_points_from_raw_txt
 from analysis.peak import calc_quant_full, calc_quant_sheet, pick_peak
 from analysis.utils import ConfigManager
 from analysis.external_data import calc_external_standards
@@ -12,10 +12,12 @@ if __name__ == '__main__':
     sheet_manager = SheetManager(configManager.get_result_file_path())
     sheet_manager.create()
     data_dir = configManager.get_data_dir()
-    calc_john_code(data_dir, sheet_manager)
+    process_raw_data(data_dir, sheet_manager)
+    x = parse_data_points_from_raw_txt(data_dir)
+    print(f'{x=}')
     rt = configManager.get_retention_times()
     analytes = rt.keys()
-    pick_peak(rt, sheet_manager, data_dir)
+    pick_peak(data_dir, sheet_manager, rt, analytes)
     calc_quant_sheet(sheet_manager)
     calc_quant_full(sheet_manager, analytes)
     calc_external_standards(sheet_manager, analytes)
