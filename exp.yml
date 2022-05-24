@@ -17,3 +17,12 @@ retention_times:
   C16: 24.709
   C17: 25.464
   C18: 26.127
+internal_std_conc:
+  C3: 50
+  C5: 50
+  C7: 50
+  C9: 50
+  C11: 50
+  C13: 50
+  C15: 50
+  C17: 50

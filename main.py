@@ -19,5 +19,6 @@ if __name__ == '__main__':
     calc_quant_sheet(sheet_manager)
     calc_quant_full(sheet_manager, analytes)
     calc_external_standards(sheet_manager, analytes)
-    calc_and_concentrate_data(sheet_manager)
+    int_std_conc = configManager.get_internal_std_conc()
+    calc_and_concentrate_data(sheet_manager, int_std_conc)
     sheet_manager.drop_tmp_sheets()
