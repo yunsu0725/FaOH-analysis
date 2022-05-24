@@ -5,12 +5,13 @@ from dataclasses import dataclass
 
 @dataclass
 class DataPoint:
-    peak_id: str
+    peak_id: int
     r_time: float
     i_time: float
     f_time: float
     area: float
     height: float
+    chain_name: str = None  # it is unknown while reading from the txt files
 
 
 def extract_rows_from_file(file_path, work_sheet, row):
@@ -86,7 +87,7 @@ def parse_data_points_from_raw_txt(data_dir: str) -> dict:
                     if len(columns) > 1:
                         data_points.append(
                             DataPoint(
-                                peak_id=columns[0],
+                                peak_id=int(columns[0]),
                                 r_time=float(columns[1]),
                                 i_time=float(columns[2]),
                                 f_time=float(columns[3]),
