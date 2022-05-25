@@ -1,4 +1,3 @@
-from distutils.command.config import config
 from pathlib import Path
 import openpyxl
 import pandas as pd
@@ -121,7 +120,6 @@ class SheetManager:
         res = dict()
 
         for row in df_list:
-            print(f'{row=}')
             first_elem = row[0]
             if first_elem in vial_set:
                 # ex row: ['FaOH-10', nan, nan, nan, nan, nan]

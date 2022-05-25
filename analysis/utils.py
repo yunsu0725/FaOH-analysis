@@ -19,16 +19,17 @@ def get_peak_id_from_row(r):
 
 class ConfigManager:
     def __init__(self, config_path: Path) -> None:
-        with io.open(config_path, 'r') as f:
-            self.configs = yaml.safe_load(f)
+        self.config_path = config_path
 
     def _get_config(self, key: str):
-        try:
-            res = self.configs[key]
-            return res
-        except KeyError:
-            print(f'please specify key: {key} in the yaml file.')
-        return None
+        with io.open(self.config_path, 'r') as f:
+            configs = yaml.safe_load(f)
+            try:
+                res = configs[key]
+                return res
+            except KeyError:
+                print(f'please specify key: {key} in the yaml file.')
+            return None
 
     def get_data_dir(self) -> Path:
         exp_data_dir = self._get_config('data_dir')
@@ -44,7 +45,7 @@ class ConfigManager:
 
     def get_retention_times(self):
         return self._get_config('retention_times')
-        
+
     def get_internal_std_conc(self):
         return self._get_config('internal_std_conc')
 
