@@ -1,6 +1,7 @@
 from pathlib import Path
 import openpyxl
 import pandas as pd
+from typing import Dict, List
 
 from analysis.data_point import DataPoint, pad_missing_chain, parse_data_point_from_quant_sheet_row
 
@@ -65,7 +66,7 @@ class SheetManager:
         del self.wb[self.quant_full_key]
         self.save_workbook()
 
-    def write_raw_data_points(self, dp_dict: dict[str, list[DataPoint]], vials: list[str]):
+    def write_raw_data_points(self, dp_dict: Dict[str, List[DataPoint]], vials: List[str]):
         sheet = self.load_raw_sheet()
         headers = DataPoint.get_raw_data_sheet_header()
         for vial in vials:
@@ -81,9 +82,9 @@ class SheetManager:
 
     def write_quantification_sheet(
         self,
-        dp_dict: dict[str, list[DataPoint]],
-        vials: list[str],
-        analytes: list[str],
+        dp_dict: Dict[str, List[DataPoint]],
+        vials: List[str],
+        analytes: List[str],
     ):
         sheet = self.load_quant_sheet()
         headers = DataPoint.get_quantification_sheet_header()
@@ -102,14 +103,14 @@ class SheetManager:
     def save_workbook(self):
         self.wb.save(self.file_path)
 
-    def load_data_points_from_quant_sheet(self, vial_names: list[str]) -> dict[str, list[DataPoint]]:
+    def load_data_points_from_quant_sheet(self, vial_names: List[str]) -> Dict[str, List[DataPoint]]:
         """construct the data points from the data frame
 
         Args:
-            vial_names (list[str]): all vial names
+            vial_names (List[str]): all vial names
 
         Returns:
-            dict[str, list[DataPoint]]: the data points dict, the key is sth like FaOH-10
+            Dict[str, List[DataPoint]]: the data points dict, the key is sth like FaOH-10
         """
         df = self.load_quant_sheet_data_frame()
         df_list = df.values.tolist()

@@ -1,9 +1,10 @@
 import pandas as pd
 from analysis.sheet_manager import SheetManager
 from openpyxl.utils.dataframe import dataframe_to_rows
+from typing import List
 
 
-def get_alc_acid_indices(dfList: list, alc_acid_ID: str) -> list:
+def get_alc_acid_indices(dfList: List, alc_acid_ID: str) -> List:
     # creates list of external standard title indicies (location of titles)
     def match(df) -> bool:
         if len(df) < 2:

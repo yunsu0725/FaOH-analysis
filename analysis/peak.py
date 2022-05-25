@@ -2,9 +2,10 @@ from analysis.data_point import DataPoint
 from analysis.sheet_manager import SheetManager
 from pathlib import Path
 import analysis.utils as utils
+from typing import Dict, List
 
 
-def pick_peak(data_dir: Path, sheet_manager: SheetManager, rt: dict, analytes):
+def pick_peak(data_dir: Path, sheet_manager: SheetManager, rt: Dict, analytes):
     work_sheet = sheet_manager.load_peak_id_sheet()
     df = sheet_manager.load_raw_data_frames()
     # Preparing list of strings called Vial_names where each element is the name of a sample
@@ -133,15 +134,15 @@ def calc_quant_full(sheet_manager: SheetManager, analytes):
     sheet_manager.save_workbook()
 
 
-def filter_unselected_points(data_points: list[DataPoint]) -> list[DataPoint]:
+def filter_unselected_points(data_points: List[DataPoint]) -> List[DataPoint]:
     return [dp for dp in data_points if dp.chain_name is not None]
 
 
 def pick_peak_from_data_points(
-    dp_dict: dict[str, list[DataPoint]],
-    rt: dict[str, float],
-    analytes: list[str],
-    vial_names: list[str],
+    dp_dict: Dict[str, List[DataPoint]],
+    rt: Dict[str, float],
+    analytes: List[str],
+    vial_names: List[str],
 ):
     # key is sth like FaOH-10 (the txt file name)
     for key, data_points in dp_dict.items():

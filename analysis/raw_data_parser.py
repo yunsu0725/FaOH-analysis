@@ -1,6 +1,7 @@
 from analysis.utils import get_all_txt_files
 from analysis.sheet_manager import SheetManager
 from analysis.data_point import DataPoint
+from typing import Dict, List
 
 
 def extract_rows_from_file(file_path, work_sheet, row):
@@ -47,7 +48,7 @@ def process_raw_data(data_dir: str, sheet_manager: SheetManager):
     sheet_manager.save_workbook()
 
 
-def parse_data_point_from_columns(columns: list) -> DataPoint:
+def parse_data_point_from_columns(columns: List) -> DataPoint:
     # Row format recorded in the txt files is as below
     # Peak#	R.Time	I.Time	F.Time	Area	Height
     try:
@@ -65,7 +66,7 @@ def parse_data_point_from_columns(columns: list) -> DataPoint:
         return None
 
 
-def parse_data_points_from_raw_txt(data_dir: str) -> dict:
+def parse_data_points_from_raw_txt(data_dir: str) -> Dict:
     all_txt_files = get_all_txt_files(data_dir)
     res = dict()
     for file in all_txt_files:
