@@ -44,6 +44,9 @@ class ConfigManager:
 
     def get_retention_times(self):
         return self._get_config('retention_times')
+        
+    def get_internal_std_conc(self):
+        return self._get_config('internal_std_conc')
 
 
 def get_all_txt_files(data_dir: Path):
