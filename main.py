@@ -28,9 +28,19 @@ def new_flow():
     #     print(f'{key=}')
     #     for dp in dps:
     #         print(f'  {dp=}')
-            
+
     sheet_manager.write_quantification_sheet(peak_dp, vial_names, analytes)
     sheet_manager.save_workbook()
+    
+    dp = sheet_manager.load_data_points_from_quant_sheet(vial_names)
+    print(f'{dp=}')
+
+    # Now it's researcher's turn to add those missing peaks manually
+    # There's such a condition because the variance of the tolerance threshold
+    # Since it is intuitive to modify the sheet directly,
+    # we'll update the datapoints after the researcher finishes updating the quant sheet
+
+    # TODO: pause and wait for the interaction, and then load them again after that
 
 
 def cur_flow():

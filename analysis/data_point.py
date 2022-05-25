@@ -45,6 +45,30 @@ class DataPoint:
         return my_idx < other_idx
 
 
+def parse_data_point_from_quant_sheet_row(df_row: list[float]) -> DataPoint:
+    """generate a data point from a given quant sheet row
+
+    Args:
+        df_row (list[float]): a row of the data frame
+
+    Returns:
+        DataPoint: corresponding data point, might be None if the df_row is invalid
+    """
+    try:
+        dp = DataPoint(
+            peak_id=df_row[5],
+            r_time=float(df_row[0]),
+            i_time=float(df_row[1]),
+            f_time=float(df_row[2]),
+            area=float(df_row[3]),
+            height=float(df_row[4])
+        )
+        return dp
+    except (IndexError, ValueError):
+        # TODO: error logger
+        return None
+
+
 def get_chain_names(data_points: list[DataPoint]) -> list[str]:
     return [dp.chain_name for dp in data_points if dp.chain_name is not None]
 

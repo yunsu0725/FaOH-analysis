@@ -1,27 +1,28 @@
+from distutils.command.config import config
 from pathlib import Path
-from typing import Callable
 import openpyxl
 import pandas as pd
 
-from analysis.data_point import DataPoint, pad_missing_chain
+from analysis.data_point import DataPoint, pad_missing_chain, parse_data_point_from_quant_sheet_row
 
 
 class SheetManager:
     def __init__(self, file_path: Path) -> None:
         self.file_path = file_path
         self.preprocess_key = 'Preprocessed Data'
-        self.peak_id_key = 'Peak_ID'
         self.quant_key = 'Quantification w IS,ES'
-        self.quant_full_key = 'Quantification w IS,ES-full'
         self.external_standard_key = 'EXT_STD'
         self.concentration_key = 'Corrected Concentration'
+        # TODO: remove
+        self.peak_id_key = 'Peak_ID'
+        self.quant_full_key = 'Quantification w IS,ES-full'
         self.wb = openpyxl.Workbook()
 
     def create(self):
         self.wb.create_sheet(title=self.preprocess_key)
-        self.wb.create_sheet(title=self.peak_id_key)
+        # self.wb.create_sheet(title=self.peak_id_key)
         self.wb.create_sheet(title=self.quant_key)
-        self.wb.create_sheet(title=self.quant_full_key)
+        # self.wb.create_sheet(title=self.quant_full_key)
         self.wb.create_sheet(title=self.external_standard_key)
         self.wb.create_sheet(title=self.concentration_key)
         del self.wb['Sheet']
@@ -29,16 +30,13 @@ class SheetManager:
     def load_raw_sheet(self):
         return self.wb[self.preprocess_key]
 
-    def _get_headers(self) -> list[str]:
-        pass
-
     def load_raw_data_frames(self):
         df = pd.read_excel(
             self.file_path, sheet_name=self.preprocess_key, header=None
         )
         return df
 
-    def load_quant_sheet_data_frame(self, use_cols=None):
+    def load_quant_sheet_data_frame(self, use_cols=None) -> pd.DataFrame:
         df = pd.read_excel(
             self.file_path, sheet_name=self.quant_key, header=None, usecols=use_cols
         )
@@ -47,6 +45,7 @@ class SheetManager:
     def load_concentration_sheet(self):
         return self.wb[self.concentration_key]
 
+    # TODO: deprecate
     def load_peak_id_sheet(self):
         return self.wb[self.peak_id_key]
 
@@ -56,9 +55,11 @@ class SheetManager:
     def load_quant_sheet(self):
         return self.wb[self.quant_key]
 
+    # TODO: deprecate
     def load_quant_full_sheet(self):
         return self.wb[self.quant_full_key]
 
+    # TODO: deprecate
     def drop_tmp_sheets(self):
         # it is a tmp workaround to drop the quant full sheet
         # we shd remove that sheet from the logic itself for long term if have time
@@ -101,3 +102,46 @@ class SheetManager:
 
     def save_workbook(self):
         self.wb.save(self.file_path)
+
+    def load_data_points_from_quant_sheet(self, vial_names: list[str]) -> dict[str, list[DataPoint]]:
+        """construct the data points from the data frame
+
+        Args:
+            vial_names (list[str]): all vial names
+
+        Returns:
+            dict[str, list[DataPoint]]: the data points dict, the key is sth like FaOH-10
+        """
+        df = self.load_quant_sheet_data_frame()
+        df_list = df.values.tolist()
+
+        vial_set = set(vial_names)
+        cur_vial = None
+        dp_list = list()
+        res = dict()
+
+        for row in df_list:
+            print(f'{row=}')
+            first_elem = row[0]
+            if first_elem in vial_set:
+                # ex row: ['FaOH-10', nan, nan, nan, nan, nan]
+                if cur_vial is not None:
+                    res[cur_vial] = dp_list
+
+                dp_list = list()
+                cur_vial = first_elem
+                continue
+
+            if row == DataPoint.get_quantification_sheet_header():
+                # ignore the header row
+                # shd be sth like: ['R.time', 'I.time', 'F.time', 'Area', 'Height', 'Peak_ID']
+                continue
+
+            dp = parse_data_point_from_quant_sheet_row(row)
+            dp_list.append(dp)
+
+        # the last vial in the sheet
+        if cur_vial is not None:
+            res[cur_vial] = dp_list
+
+        return res
