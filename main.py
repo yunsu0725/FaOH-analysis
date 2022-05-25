@@ -5,42 +5,78 @@ from analysis.external_data import calc_external_standards
 from analysis.sheet_manager import SheetManager
 from analysis.concentrate import calc_and_concentrate_data
 from pathlib import Path
+import click
 
 
+welcome_msg = "This is an interactive command line tool for processing your experiment data. Let's do it step by step!"
+
+init_msg = """
+There are two things you need to do before using this tool:
+1. Wrap your txt files in a folder
+2. Put that folder under the "data" directory.
+3. Open "exp.yml" (it should be in the same folder as "main.py") and enter the following information for further data processing.
+    a) data_dir: The name of the folder you put your txt files in.
+    b) target_file: Name you want for your final excel file.
+"""
+
+confirm_yaml_update_msg = "Have you updated the 'data_dir' and 'target_file' in the YAML config?"
+
+preprocess_end_description = """
+The program finishes the raw data processing. Now you should see the target .xlsx file under res/ directory.
+There's a sheet 'Preprocessed Data' listing what from the .txt files.
+Now you might want to read the sheet and check the new 'retention_time' values, so the program will pause until you finish.
+"""
+
+confirm_r_time_description = "Have you updated the 'retention_time' in the YAML config?"
+
+quant_sheet_end_description = """
+Now you can see that there's another sheet with the quantification data. There might be some missing peaks, and the
+program will pause until you manually updating them.
+"""
+
+confirm_quant_description = "Have you updated the missing peaks in the quantification sheet, if any?"
+
+
+@click.command()
 def new_flow():
+    print(welcome_msg)
+    print(init_msg)
+    if not click.confirm(confirm_yaml_update_msg, default=True):
+        exit()
+
     configManager = ConfigManager(Path('./exp.yml'))
     sheet_manager = SheetManager(configManager.get_result_file_path())
     sheet_manager.create()
     data_dir = configManager.get_data_dir()
     all_txt_files = get_all_txt_files(data_dir)
     vial_names = get_vial_names(all_txt_files)
-
     process_raw_data(data_dir, sheet_manager)
     data_points = parse_data_points_from_raw_txt(data_dir)
-    # print(f'{data_points=}')
     sheet_manager.write_raw_data_points(data_points, vial_names)
+    sheet_manager.save_workbook()
 
+    print(preprocess_end_description)
+    if not click.confirm(confirm_r_time_description, default=True):
+        exit()
+
+    print("The program is processing the quantification sheet.")
     rt = configManager.get_retention_times()
     analytes = rt.keys()
-
     peak_dp = pick_peak_from_data_points(data_points, rt, analytes, vial_names)
-    # for key, dps in peak_dp.items():
-    #     print(f'{key=}')
-    #     for dp in dps:
-    #         print(f'  {dp=}')
-
     sheet_manager.write_quantification_sheet(peak_dp, vial_names, analytes)
     sheet_manager.save_workbook()
-    
-    dp = sheet_manager.load_data_points_from_quant_sheet(vial_names)
-    print(f'{dp=}')
+    print(quant_sheet_end_description)
 
     # Now it's researcher's turn to add those missing peaks manually
     # There's such a condition because the variance of the tolerance threshold
     # Since it is intuitive to modify the sheet directly,
     # we'll update the datapoints after the researcher finishes updating the quant sheet
 
-    # TODO: pause and wait for the interaction, and then load them again after that
+    if not click.confirm(confirm_quant_description, default=True):
+        exit()
+
+    dp = sheet_manager.load_data_points_from_quant_sheet(vial_names)
+    print(f'{dp=}')
 
 
 def cur_flow():

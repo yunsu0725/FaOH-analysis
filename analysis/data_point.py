@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -11,20 +12,20 @@ class DataPoint:
     height: float
     chain_name: str = None  # it is unknown while reading from the txt files
 
-    def get_raw_data_row(self) -> list:
+    def get_raw_data_row(self) -> List:
         return [
             self.peak_id, self.r_time, self.i_time, self.f_time, self.area, self.height
         ]
 
     @classmethod
-    def get_raw_data_sheet_header(cls) -> list[str]:
+    def get_raw_data_sheet_header(cls) -> List[str]:
         return ['Peak#', 'R.Time', 'I.Time', 'F.Time', 'Area', 'Height']
 
     @classmethod
-    def get_quantification_sheet_header(cls) -> list[str]:
+    def get_quantification_sheet_header(cls) -> List[str]:
         return ['R.time', 'I.time', 'F.time', 'Area', 'Height', 'Peak_ID']
 
-    def get_quantification_sheet_row(self) -> list:
+    def get_quantification_sheet_row(self) -> List:
         return [
             self.r_time, self.i_time, self.f_time, self.area, self.height, self.chain_name
         ]
@@ -45,11 +46,11 @@ class DataPoint:
         return my_idx < other_idx
 
 
-def parse_data_point_from_quant_sheet_row(df_row: list[float]) -> DataPoint:
+def parse_data_point_from_quant_sheet_row(df_row: List[float]) -> DataPoint:
     """generate a data point from a given quant sheet row
 
     Args:
-        df_row (list[float]): a row of the data frame
+        df_row (List[float]): a row of the data frame
 
     Returns:
         DataPoint: corresponding data point, might be None if the df_row is invalid
@@ -69,14 +70,14 @@ def parse_data_point_from_quant_sheet_row(df_row: list[float]) -> DataPoint:
         return None
 
 
-def get_chain_names(data_points: list[DataPoint]) -> list[str]:
+def get_chain_names(data_points: List[DataPoint]) -> List[str]:
     return [dp.chain_name for dp in data_points if dp.chain_name is not None]
 
 
 def pad_missing_chain(
-    data_points: list[DataPoint],
-    analytes: list[str]
-) -> list[DataPoint]:
+    data_points: List[DataPoint],
+    analytes: List[str]
+) -> List[DataPoint]:
     chain_names = set(get_chain_names(data_points))
     missing_chains = [a for a in analytes if a not in chain_names]
     pad = [
