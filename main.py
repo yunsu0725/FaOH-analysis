@@ -1,7 +1,7 @@
 from analysis.raw_data_parser import process_raw_data, parse_data_points_from_raw_txt
 from analysis.peak import calc_quant_full, calc_quant_sheet, pick_peak_from_data_points, pick_peak
 from analysis.utils import ConfigManager, get_all_txt_files, get_vial_names
-from analysis.external_data import calc_external_standards
+from analysis.external_data import calc_external_standards, calc_external_std_data_from_dp
 from analysis.sheet_manager import SheetManager
 from analysis.concentrate import calc_and_concentrate_data
 from pathlib import Path
@@ -76,8 +76,10 @@ def new_flow():
         exit()
 
     dp = sheet_manager.load_data_points_from_quant_sheet(vial_names)
-    print(f'{dp=}')
-    calc_external_standards(sheet_manager, analytes)
+    x, conc_num = calc_external_std_data_from_dp(
+        dp, alc_acid_id='FaOH', analytes=analytes)
+    sheet_manager.write_ext_std_sheet(x, conc_num)
+    sheet_manager.save_workbook()
 
 
 def cur_flow():

@@ -1,8 +1,16 @@
+from turtle import st
 import pandas as pd
 from analysis.data_point import DataPoint
 from analysis.sheet_manager import SheetManager
 from openpyxl.utils.dataframe import dataframe_to_rows
 from typing import Dict, List
+from dataclasses import dataclass
+
+
+@dataclass
+class ExtStdDataPoint:
+    conc: int
+    peak_area: float
 
 
 def get_alc_acid_indices(dfList: List, alc_acid_ID: str) -> List:
@@ -12,21 +20,23 @@ def get_alc_acid_indices(dfList: List, alc_acid_ID: str) -> List:
             return False
         name = df[1]
         return name[:name.find('-')] == alc_acid_ID
-        
+
     print(f'{dfList=}')
 
     return [
         i for i, df in enumerate(dfList) if match(df)
     ]
 
+
 def get_alc_acid_indices_from_dp_dict(dp_dict: Dict[str, DataPoint]):
     pass
-    
+
 
 def vial_matches_alc_acid_id(vial: str, alc_acid_id: str):
     # Example: FaOH-10 will match the alc_acid_id FaOH here.
     return vial[:vial.find('-')] == alc_acid_id
-    
+
+
 def get_dp_subset_by_alc_acid_id(
     dp_dict: Dict[str, List[DataPoint]],
     alc_acid_id: str
@@ -36,14 +46,52 @@ def get_dp_subset_by_alc_acid_id(
         vial: dp_list for vial, dp_list in dp_dict.items() if vial_matches_alc_acid_id(vial, alc_acid_id)
     }
     return res
-    
+
+
+def get_vial_conc(vial_label: str) -> int:
+    cut_index = vial_label.find('-') + 1
+    # 'FaOH-100' -> '100'
+    conc_str = vial_label[cut_index:]
+    # TODO: err handling probably?
+    return int(conc_str)
+
+
+def filter_dulplicate_conc(dp_list: List[DataPoint]) -> List[DataPoint]:
+    selected_dp = {}
+    for dp in dp_list:
+        if (conc := dp.conc) is None:
+            continue
+        elif conc not in selected_dp:
+            selected_dp[conc] = dp
+        elif selected_dp[conc].area < dp.area:
+            selected_dp[conc] = dp
+    res = [x for x in selected_dp.values()]
+    return sorted(res, key=lambda x: x.conc)
+
 
 def calc_external_std_data_from_dp(
     dp_dict: Dict[str, DataPoint],
-    standards_used: Dict[str, List],
-    alc_acid_id: str
+    alc_acid_id: str,
+    analytes: List[str]
 ):
-    pass
+    dp_subset = get_dp_subset_by_alc_acid_id(dp_dict, alc_acid_id)
+    print(f'{dp_subset.keys()=}')
+    conc_num = len(dp_subset.keys())
+    res = {
+        a: [] for a in analytes
+        # example: 'C3': List[DataPoint]
+    }
+    for vial, dp_list in dp_subset.items():
+        conc = get_vial_conc(vial)
+        for dp in dp_list:
+            dp.conc = conc
+            res[dp.chain_name].append(dp)
+
+    for chain, dp_list in res.items():
+        res[chain] = filter_dulplicate_conc(dp_list)
+
+    return res, conc_num
+
 
 def calc_external_std_data(sheet_manager: SheetManager, standards_used, alc_acid_ID):
     # TODO: avoid the magic indices here: 3 -> area 5 -> peak id
@@ -126,7 +174,7 @@ def calc_external_std_data(sheet_manager: SheetManager, standards_used, alc_acid
         # shd figure it out
         if i != 1:
             sheet.append(r[1:])
-            
+
 
 def calc_external_standards(sheet_manager: SheetManager, analytes):
     # sth like {'C3': [], 'C4': [],...,'C18': []}
@@ -136,4 +184,3 @@ def calc_external_standards(sheet_manager: SheetManager, analytes):
     alc_acid_ID = 'FaOH'
     calc_external_std_data(sheet_manager, standards_used, alc_acid_ID)
     sheet_manager.save_workbook()
-
