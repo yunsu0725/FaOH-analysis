@@ -38,13 +38,14 @@ confirm_quant_description = "Have you updated the missing peaks in the quantific
 
 
 @click.command()
-def process():
+@click.option('--data_dir', prompt='Please paste the target data directory')
+def process(data_dir: str):
     print(welcome_msg)
+    configManager = ConfigManager(Path(data_dir))
     print(init_msg)
     if not click.confirm(confirm_yaml_update_msg, default=True):
         exit()
 
-    configManager = ConfigManager(Path('./exp.yml'))
     sheet_manager = SheetManager(configManager.get_result_file_path())
     sheet_manager.create()
     data_dir = configManager.get_data_dir()
