@@ -108,7 +108,7 @@ def calc_and_concentrate_data(sheet_manager: SheetManager, int_std_conc: dict):
             # only append data
             continue
         label = r[1]
-        if re.match(r'C\d+', label) and is_internal_condition(label):
+        if re.match(r'C\d+$', label) and is_internal_condition(label):
             # The regular expression matches labels like C1, C2,...,CN where N is a nature number
             # So it captures those chain labels here.
             # Moreover, we'd like to ignore those internal standard conc
