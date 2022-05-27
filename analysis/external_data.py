@@ -1,4 +1,3 @@
-from turtle import st
 import pandas as pd
 from analysis.data_point import DataPoint
 from analysis.sheet_manager import SheetManager

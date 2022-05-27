@@ -80,6 +80,8 @@ def new_flow():
         dp, alc_acid_id='FaOH', analytes=analytes)
     sheet_manager.write_ext_std_sheet(x, conc_num)
     sheet_manager.save_workbook()
+    int_std_conc = configManager.get_internal_std_conc()
+    calc_and_concentrate_data(sheet_manager, int_std_conc)
 
 
 def cur_flow():
