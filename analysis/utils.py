@@ -35,7 +35,7 @@ class ConfigManager:
         exp_data_dir = self._get_config('data_dir')
         if exp_data_dir is None:
             return None
-        return get_main_dir() / 'data' / exp_data_dir
+        return Path(exp_data_dir)
 
     def get_result_file_path(self) -> Path:
         target_file = self._get_config('target_file')

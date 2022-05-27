@@ -1,5 +1,5 @@
-data_dir: example
-target_file: "test_ext_std.xlsx"
+data_dir: "/Users/Claire/Desktop/UW-madison/lab/2022/RBOx in vivo/20220507 trc-tet RBS library test"
+target_file: "miao.xlsx"
 retention_times:
   C3: 4.080
   C4: 7.645
