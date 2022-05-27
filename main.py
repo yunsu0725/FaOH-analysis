@@ -77,6 +77,7 @@ def new_flow():
 
     dp = sheet_manager.load_data_points_from_quant_sheet(vial_names)
     print(f'{dp=}')
+    calc_external_standards(sheet_manager, analytes)
 
 
 def cur_flow():

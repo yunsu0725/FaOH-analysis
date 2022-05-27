@@ -1,3 +1,4 @@
+from email import header
 from pathlib import Path
 import openpyxl
 import pandas as pd
@@ -91,7 +92,7 @@ class SheetManager:
         for vial in vials:
             try:
                 data_points = dp_dict[vial]
-                sheet.append([vial])
+                sheet.append([vial for _ in range(len(headers))])
                 sheet.append(headers)
                 pad_dps = pad_missing_chain(data_points, analytes)
                 for dp in pad_dps:
