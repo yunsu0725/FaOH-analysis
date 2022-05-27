@@ -39,9 +39,10 @@ class ConfigManager:
 
     def get_result_file_path(self) -> Path:
         target_file = self._get_config('target_file')
-        if target_file is None:
+        data_dir = self.get_data_dir()
+        if target_file is None or data_dir is None:
             return None
-        return get_main_dir() / 'res' / target_file
+        return data_dir / target_file
 
     def get_retention_times(self):
         return self._get_config('retention_times')
