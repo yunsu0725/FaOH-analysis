@@ -4,13 +4,14 @@ from typing import List
 
 @dataclass
 class DataPoint:
-    peak_id: int
+    peak_id: int  # FIXME: maybe we don't need it since it is not concerned?
     r_time: float
     i_time: float
     f_time: float
     area: float
     height: float
     chain_name: str = None  # it is unknown while reading from the txt files
+    conc: int = None # it is None unless the dp belong to a alc_acid_id label, such as FaOH-100 (conc = 100 here)
 
     def get_raw_data_row(self) -> List:
         return [
@@ -58,6 +59,7 @@ def parse_data_point_from_quant_sheet_row(df_row: List[float]) -> DataPoint:
     try:
         dp = DataPoint(
             peak_id=df_row[5],
+            chain_name=df_row[5],
             r_time=float(df_row[0]),
             i_time=float(df_row[1]),
             f_time=float(df_row[2]),

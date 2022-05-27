@@ -91,7 +91,7 @@ class SheetManager:
         for vial in vials:
             try:
                 data_points = dp_dict[vial]
-                sheet.append([vial])
+                sheet.append([vial for _ in range(len(headers))])
                 sheet.append(headers)
                 pad_dps = pad_missing_chain(data_points, analytes)
                 for dp in pad_dps:
@@ -102,6 +102,18 @@ class SheetManager:
 
     def save_workbook(self):
         self.wb.save(self.file_path)
+
+    def write_ext_std_sheet(self, chain_dp_dict: Dict[str, List[DataPoint]], conc_num: int):
+        sheet = self.load_external_standard_sheet()
+        headers = ['Chain Length']
+        for _ in range(conc_num):
+            headers = headers + ['Conc (mg/L)', 'Peak Area']
+        sheet.append(headers)
+        for chain, dp_list in chain_dp_dict.items():
+            row = [chain]
+            for dp in dp_list:
+                row = row + [dp.conc, dp.area]
+            sheet.append(row)
 
     def load_data_points_from_quant_sheet(self, vial_names: List[str]) -> Dict[str, List[DataPoint]]:
         """construct the data points from the data frame
