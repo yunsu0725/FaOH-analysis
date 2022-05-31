@@ -4,7 +4,6 @@ import numpy as np
 import math
 from analysis.sheet_manager import SheetManager
 from openpyxl.utils.dataframe import dataframe_to_rows
-from dataclasses import dataclass
 
 
 def calc_area_conc_scale(sheet_manager: SheetManager):
