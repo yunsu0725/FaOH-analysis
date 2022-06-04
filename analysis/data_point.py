@@ -10,8 +10,10 @@ class DataPoint:
     f_time: float
     area: float
     height: float
+    vial_name: str
     chain_name: str = None  # it is unknown while reading from the txt files
-    conc: int = None # it is None unless the dp belong to a alc_acid_id label, such as FaOH-100 (conc = 100 here)
+    # it is None unless the dp belong to a alc_acid_id label, such as FaOH-100 (conc = 100 here)
+    conc: int = None
 
     def get_raw_data_row(self) -> List:
         return [
@@ -25,6 +27,15 @@ class DataPoint:
     @classmethod
     def get_quantification_sheet_header(cls) -> List[str]:
         return ['R.time', 'I.time', 'F.time', 'Area', 'Height', 'Peak_ID']
+
+    def get_conc(self):
+        cut_index = self.vial_name.find('-') + 1
+        # 'FaOH-100' -> '100'
+        conc_str = self.vial_name.vial_label[cut_index:]
+        try:
+            return int(conc_str)
+        except ValueError:
+            return None
 
     def get_quantification_sheet_row(self) -> List:
         return [

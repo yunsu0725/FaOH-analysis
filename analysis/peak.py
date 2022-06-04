@@ -6,6 +6,20 @@ def filter_unselected_points(data_points: List[DataPoint]) -> List[DataPoint]:
     return [dp for dp in data_points if dp.chain_name is not None]
 
 
+def filter_duplicate_conc(dp_list: List[DataPoint]) -> List[DataPoint]:
+    selected_dp = {}
+    for dp in dp_list:
+        conc = dp.get_conc()
+        if conc is None:
+            continue
+        elif conc not in selected_dp:
+            selected_dp[conc] = dp
+        elif selected_dp[conc].area < dp.area:
+            selected_dp[conc] = dp
+    res = [x for x in selected_dp.values()]
+    return sorted(res, key=lambda x: x.get_conc())
+
+
 def pick_peaks(
     dp_dict: Dict[str, List[DataPoint]],
     rt: Dict[str, float],
@@ -29,8 +43,14 @@ def pick_peaks(
                 if lower_tolerance < dp.r_time < upper_tolerance:
                     dp.chain_name = a
 
-    # drop those data points not binded with any peak (ie the chain name is not set)
+    def filter_points(dp: List[DataPoint]) -> List[DataPoint]:
+        # drop those data points not binded with any peak (ie the chain name is not set)
+        selected_dp = filter_unselected_points(dp)
+        # remove the duplicate peaks
+        unique_dp = filter_duplicate_conc(selected_dp)
+        return unique_dp
+
     res = {
-        key: filter_unselected_points(data_points=dp) for key, dp in dp_dict.items()
+        key: filter_points(dp) for key, dp in dp_dict.items()
     }
     return res
