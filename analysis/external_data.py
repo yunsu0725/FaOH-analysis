@@ -33,7 +33,6 @@ def calc_external_std_data(
     analytes: List[str]
 ):
     dp_subset = get_dp_subset_by_alc_acid_id(dp_dict, alc_acid_id)
-    print(f'{dp_subset.keys()=}')
     conc_num = len(dp_subset.keys())
     res = {
         a: [] for a in analytes
