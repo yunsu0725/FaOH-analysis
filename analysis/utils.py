@@ -39,7 +39,7 @@ class ConfigManager:
                     f'C{idx}': 50 for idx in range(3, 19, 2)
                     # C3: 50, C5: 50,..., C17: 50
                 },
-                self._target_file_key: 'miao.xlsx'
+                self._target_file_key: 'GCFID.xlsx'
             }
             yaml.dump(template, f, default_flow_style=False, sort_keys=False)
 
