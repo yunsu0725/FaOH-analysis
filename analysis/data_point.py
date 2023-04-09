@@ -10,8 +10,10 @@ class DataPoint:
     f_time: float
     area: float
     height: float
+    vial_name: str
     chain_name: str = None  # it is unknown while reading from the txt files
-    conc: int = None # it is None unless the dp belong to a alc_acid_id label, such as FaOH-100 (conc = 100 here)
+    # it is None unless the dp belong to a alc_acid_id label, such as FaOH-100 (conc = 100 here)
+    conc: int = None
 
     def get_raw_data_row(self) -> List:
         return [
@@ -25,6 +27,18 @@ class DataPoint:
     @classmethod
     def get_quantification_sheet_header(cls) -> List[str]:
         return ['R.time', 'I.time', 'F.time', 'Area', 'Height', 'Peak_ID']
+
+    def get_conc(self):
+        cut_index = self.vial_name.find('-') + 1
+        # 'FaOH-100' -> '100'
+        conc_str = self.vial_name[cut_index:]
+        try:
+            return int(conc_str)
+        except ValueError:
+            return None
+
+    def get_chain_index(self) -> int:
+        return int(self.chain_name[1:])
 
     def get_quantification_sheet_row(self) -> List:
         return [
@@ -47,7 +61,7 @@ class DataPoint:
         return my_idx < other_idx
 
 
-def parse_data_point_from_quant_sheet_row(df_row: List[float]) -> DataPoint:
+def parse_data_point_from_quant_sheet_row(df_row: List[float], vial_name: str) -> DataPoint:
     """generate a data point from a given quant sheet row
 
     Args:
@@ -64,7 +78,8 @@ def parse_data_point_from_quant_sheet_row(df_row: List[float]) -> DataPoint:
             i_time=float(df_row[1]),
             f_time=float(df_row[2]),
             area=float(df_row[3]),
-            height=float(df_row[4])
+            height=float(df_row[4]),
+            vial_name=vial_name
         )
         return dp
     except (IndexError, ValueError):
@@ -78,7 +93,8 @@ def get_chain_names(data_points: List[DataPoint]) -> List[str]:
 
 def pad_missing_chain(
     data_points: List[DataPoint],
-    analytes: List[str]
+    analytes: List[str],
+    vial_name: str
 ) -> List[DataPoint]:
     chain_names = set(get_chain_names(data_points))
     missing_chains = [a for a in analytes if a not in chain_names]
@@ -90,7 +106,8 @@ def pad_missing_chain(
             f_time=0,
             area=0,
             height=0,
-            chain_name=chain_name
+            chain_name=chain_name,
+            vial_name=vial_name
         )
         for chain_name in missing_chains
     ]

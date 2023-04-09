@@ -142,3 +142,5 @@ res/**/*.xlsx
 # exp data
 data/**/*.TXT
 data/**/*.txt
+data/**/*.yml
+data/**/*.xlsx

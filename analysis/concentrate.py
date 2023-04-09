@@ -25,7 +25,6 @@ def calc_area_conc_scale(sheet_manager: SheetManager):
             res[label] = np.polyfit(conc, area, 1)[0]
         except ValueError:
             print(f'Invalid area or conc for: {label}')
-    print(f'{res=}')
     return res
 
 

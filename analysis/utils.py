@@ -21,51 +21,47 @@ class ConfigManager:
     def __init__(self, data_dir: Path) -> None:
         self.data_dir = data_dir
         self.config_path = data_dir / 'config.yml'
+        self._data_dir_key = 'data_dir'
+        self._rt_key = 'retention_time'
+        self._int_std_conc_key = 'internal_std_conc'
+        self._target_file_key = 'target_file'
         if not self.config_path.exists():
             self._create_config_file()
 
     def _create_config_file(self):
         with open(self.config_path, 'w') as f:
             template = {
-                'retention_time': {
+                self._rt_key: {
                     f'C{idx}': 0 for idx in range(3, 19)
                     # C3: 0, C4: 0,..., C18: 0
                 },
-                'internal_std_conc': {
+                self._int_std_conc_key: {
                     f'C{idx}': 50 for idx in range(3, 19, 2)
                     # C3: 50, C5: 50,..., C17: 50
-                }
+                },
+                self._target_file_key: 'miao.xlsx'
             }
             yaml.dump(template, f, default_flow_style=False, sort_keys=False)
 
     def _get_config(self, key: str):
         with io.open(self.config_path, 'r') as f:
             configs = yaml.safe_load(f)
-            try:
-                res = configs[key]
-                return res
-            except KeyError:
-                print(f'please specify key: {key} in the yaml file.')
-            return None
+            return configs[key]
 
     def get_data_dir(self) -> Path:
-        exp_data_dir = self._get_config('data_dir')
-        if exp_data_dir is None:
-            return None
-        return Path(exp_data_dir)
+        return self.data_dir
 
     def get_result_file_path(self) -> Path:
-        target_file = self._get_config('target_file')
-        data_dir = self.get_data_dir()
-        if target_file is None or data_dir is None:
+        target_file = self._get_config(self._target_file_key)
+        if self.data_dir is None:
             return None
-        return data_dir / target_file
+        return self.data_dir / target_file
 
     def get_retention_times(self):
-        return self._get_config('retention_times')
+        return self._get_config(self._rt_key)
 
     def get_internal_std_conc(self):
-        return self._get_config('internal_std_conc')
+        return self._get_config(self._int_std_conc_key)
 
 
 def get_all_txt_files(data_dir: Path):
