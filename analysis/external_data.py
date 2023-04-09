@@ -26,18 +26,6 @@ def get_vial_conc(vial_label: str) -> int:
     return int(conc_str)
 
 
-def filter_dulplicate_conc(dp_list: List[DataPoint]) -> List[DataPoint]:
-    selected_dp = {}
-    for dp in dp_list:
-        if (conc := dp.conc) is None:
-            continue
-        elif conc not in selected_dp:
-            selected_dp[conc] = dp
-        elif selected_dp[conc].area < dp.area:
-            selected_dp[conc] = dp
-    res = [x for x in selected_dp.values()]
-    return sorted(res, key=lambda x: x.conc)
-
 
 def calc_external_std_data(
     dp_dict: Dict[str, DataPoint],
@@ -45,7 +33,6 @@ def calc_external_std_data(
     analytes: List[str]
 ):
     dp_subset = get_dp_subset_by_alc_acid_id(dp_dict, alc_acid_id)
-    print(f'{dp_subset.keys()=}')
     conc_num = len(dp_subset.keys())
     res = {
         a: [] for a in analytes
@@ -57,7 +44,5 @@ def calc_external_std_data(
             dp.conc = conc
             res[dp.chain_name].append(dp)
 
-    for chain, dp_list in res.items():
-        res[chain] = filter_dulplicate_conc(dp_list)
-
     return res, conc_num
+

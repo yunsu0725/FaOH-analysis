@@ -67,7 +67,7 @@ class SheetManager:
                 data_points = dp_dict[vial]
                 sheet.append([vial for _ in range(len(headers))])
                 sheet.append(headers)
-                pad_dps = pad_missing_chain(data_points, analytes)
+                pad_dps = pad_missing_chain(data_points, analytes, vial)
                 for dp in pad_dps:
                     sheet.append(dp.get_quantification_sheet_row())
             except KeyError:
@@ -122,7 +122,7 @@ class SheetManager:
                 # shd be sth like: ['R.time', 'I.time', 'F.time', 'Area', 'Height', 'Peak_ID']
                 continue
 
-            dp = parse_data_point_from_quant_sheet_row(row)
+            dp = parse_data_point_from_quant_sheet_row(row, cur_vial)
             dp_list.append(dp)
 
         # the last vial in the sheet
