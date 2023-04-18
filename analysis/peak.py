@@ -22,6 +22,7 @@ def pick_peaks(
     rt: Dict[str, float],
     analytes: List[str],
     vial_names: List[str],
+    threshold: float,
 ):
     # key is sth like FaOH-10 (the txt file name)
     for key, data_points in dp_dict.items():
@@ -34,9 +35,8 @@ def pick_peaks(
         for dp in data_points:
             for a in analytes:
                 # a is sth like C3
-                # TODO: make the threshold configurable
-                upper_tolerance = rt[a] + 0.1
-                lower_tolerance = rt[a] - 0.1
+                upper_tolerance = rt[a] + threshold
+                lower_tolerance = rt[a] - threshold
                 if lower_tolerance < dp.r_time < upper_tolerance:
                     dp.chain_name = a
 
