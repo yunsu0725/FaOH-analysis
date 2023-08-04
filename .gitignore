@@ -142,5 +142,10 @@ res/**/*.xlsx
 # exp data
 data/**/*.TXT
 data/**/*.txt
+<<<<<<< Updated upstream
 data/**/*.yml
 data/**/*.xlsx
+||||||| constructed merge base
+=======
+data/example.zip
+>>>>>>> Stashed changes
