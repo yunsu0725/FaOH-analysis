@@ -8,27 +8,27 @@ from pathlib import Path
 import click
 
 
-welcome_msg = "This is an interactive command line tool for processing your experiment data. Let's do it step by step!"
+welcome_msg = "This is an interactive command line tool to convert peak area into product concentrations. Let's get started!"
 
 preprocess_end_description = """
-The program finishes the raw data processing. You will find miao.xlsx and config.yml in the folder.
-The config.yml is where you might need to update, and the miao.xlsx is the result.
-There's a sheet 'Preprocessed Data' listing what from the .txt files.
-You should check the sheet and update the 'retention_time' values in the YAML file.
+The program had extracted RT and peak area data from .txt files into a large Excel sheet named GCFID.xlsx. 
+Under the same folder there's another new file named config.yml. Update RT and internal std concentrations in this file by referring to the "Preprocessed Data" tab of GCFID.xlsx.
+Save the .yml file and answer the question below.
 """
 
-confirm_r_time_description = "Have you updated the 'retention_time' in the YAML config?"
+confirm_r_time_description = "Have you updated RT and int. std. in config.yml?"
 
 quant_sheet_end_description = """
-Now you can find another sheet with the quantification data.
-There might be some missing peaks, please check and update them manually.
+Now you can find another tab in GCFID.xlsx named "Quantification with IS, ES".
+If you don't see any values in the tab, reopen the Excel sheet.
+If there are missing peaks, check and update them manually from "Preprocessed Data" tab.
 """
 
-confirm_quant_description = "Have you updated the missing peaks in the quantification sheet, if any?"
+confirm_quant_description = """Have you updated the missing peaks in the "Quantification" tab, if any?"""
 
 
 @click.command()
-@click.option('--data_dir', prompt='Please paste the target data directory')
+@click.option('--data_dir', prompt='Please paste the path of your target data folder')
 def process(data_dir: str):
     configManager = ConfigManager(Path(data_dir))
     sheet_manager = SheetManager(configManager.get_result_file_path())
