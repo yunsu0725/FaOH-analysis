@@ -16,8 +16,10 @@ You should find two files, miao.xlsx and config.yml, in the folder.
 The config.yml is where you might need to update, and the miao.xlsx is the result.
 There's a sheet 'Preprocessed Data' listing what from the .txt files.
 
-You should check the sheet and update the 'retention_time' values in the YAML file.
-Also, you can change the peak threshold as you want by updating 'peak_threshold' value in the YAML.
+You should check the sheet and update 'retention_time' values
+of the YAML file accordingly.
+Also, you can change the peak threshold as you want by updating
+'peak_threshold_upper' and 'peak_threshold_lower' values in the YAML.
 """
 
 confirm_r_time_description = "Have you updated the YAML config?"

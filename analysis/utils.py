@@ -41,7 +41,10 @@ class ConfigManager:
                     # C3: 50, C5: 50,..., C17: 50
                 },
                 self._target_file_key: 'miao.xlsx',
-                self._peak_threshold_key: 0.1
+                self._peak_threshold_key: {
+                    'lower': 0.1,
+                    'upper': 0.1,
+                }
             }
             yaml.dump(template, f, default_flow_style=False, sort_keys=False)
 
@@ -65,13 +68,14 @@ class ConfigManager:
     def get_internal_std_conc(self):
         return self._get_config(self._int_std_conc_key)
 
-    def get_peak_threshold(self):
+    def get_peak_threshold(self) -> (float, float):
         v = self._get_config(self._peak_threshold_key)
         try:
-            return float(v)
-        except ValueError:
+            lower, upper = v['lower'], v['upper']
+            return float(lower), float(upper)
+        except (ValueError, KeyError):
             print(f'Fail to parse threshold. Raw value: {v}.')
-        return 0.1
+        return 0.1, 0.1
 
 
 def get_all_txt_files(data_dir: Path):
