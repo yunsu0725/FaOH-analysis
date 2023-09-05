@@ -11,13 +11,18 @@ import click
 welcome_msg = "This is an interactive command line tool for processing your experiment data. Let's do it step by step!"
 
 preprocess_end_description = """
-The program finishes the raw data processing. You will find miao.xlsx and config.yml in the folder.
+The program finishes the raw data processing.
+You should find two files, miao.xlsx and config.yml, in the folder.
 The config.yml is where you might need to update, and the miao.xlsx is the result.
 There's a sheet 'Preprocessed Data' listing what from the .txt files.
-You should check the sheet and update the 'retention_time' values in the YAML file.
+
+You should check the sheet and update 'retention_time' values
+of the YAML file accordingly.
+Also, you can change the peak threshold as you want by updating
+'peak_threshold_upper' and 'peak_threshold_lower' values in the YAML.
 """
 
-confirm_r_time_description = "Have you updated the 'retention_time' in the YAML config?"
+confirm_r_time_description = "Have you updated the YAML config?"
 
 quant_sheet_end_description = """
 Now you can find another sheet with the quantification data.
@@ -46,7 +51,8 @@ def process(data_dir: str):
 
     rt = configManager.get_retention_times()
     analytes = rt.keys()
-    peak_dp = pick_peaks(data_points, rt, analytes, vial_names)
+    peak_threshold = configManager.get_peak_threshold()
+    peak_dp = pick_peaks(data_points, rt, analytes, vial_names, peak_threshold)
     sheet_manager.write_quantification_sheet(peak_dp, vial_names, analytes)
     sheet_manager.save_workbook()
     print(quant_sheet_end_description)
