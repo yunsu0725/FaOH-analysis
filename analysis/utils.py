@@ -25,6 +25,7 @@ class ConfigManager:
         self._rt_key = 'retention_time'
         self._int_std_conc_key = 'internal_std_conc'
         self._target_file_key = 'target_file'
+        self._peak_threshold_key = 'peak_threshold'
         if not self.config_path.exists():
             self._create_config_file()
 
@@ -39,7 +40,11 @@ class ConfigManager:
                     f'C{idx}': 50 for idx in range(3, 19, 2)
                     # C3: 50, C5: 50,..., C17: 50
                 },
-                self._target_file_key: 'GCFID.xlsx'
+                self._target_file_key: 'GCFID.xlsx',
+                self._peak_threshold_key: {
+                    'lower': 0.1,
+                    'upper': 0.1,
+                }
             }
             yaml.dump(template, f, default_flow_style=False, sort_keys=False)
 
@@ -62,6 +67,15 @@ class ConfigManager:
 
     def get_internal_std_conc(self):
         return self._get_config(self._int_std_conc_key)
+
+    def get_peak_threshold(self) -> (float, float):
+        v = self._get_config(self._peak_threshold_key)
+        try:
+            lower, upper = v['lower'], v['upper']
+            return float(lower), float(upper)
+        except (ValueError, KeyError):
+            print(f'Fail to parse threshold. Raw value: {v}.')
+        return 0.1, 0.1
 
 
 def get_all_txt_files(data_dir: Path):
