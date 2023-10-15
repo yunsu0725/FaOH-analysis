@@ -67,6 +67,7 @@ def process(data_dir: str):
     sheet_manager.save_workbook()
     int_std_conc = configManager.get_internal_std_conc()
     calc_and_concentrate_data(sheet_manager, int_std_conc)
+    configManager.save_current_cfg()
 
 
 if __name__ == '__main__':

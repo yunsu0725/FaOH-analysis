@@ -20,6 +20,9 @@ def get_peak_id_from_row(r):
 class ConfigManager:
     def __init__(self, data_dir: Path) -> None:
         self.data_dir = data_dir
+        self.prev_config_path = Path(
+            __file__
+        ).parent.parent / 'last_time_config.yml'
         self.config_path = data_dir / 'config.yml'
         self._data_dir_key = 'data_dir'
         self._rt_key = 'retention_time'
@@ -30,6 +33,10 @@ class ConfigManager:
             self._create_config_file()
 
     def _create_config_file(self):
+        prev_cfg = None
+        with open(self.prev_config_path, 'r') as f:
+            prev_cfg = yaml.safe_load(f)
+
         with open(self.config_path, 'w') as f:
             template = {
                 self._rt_key: {
@@ -45,7 +52,7 @@ class ConfigManager:
                     'lower': 0.1,
                     'upper': 0.1,
                 }
-            }
+            } if prev_cfg is None else prev_cfg
             yaml.dump(template, f, default_flow_style=False, sort_keys=False)
 
     def _get_config(self, key: str):
@@ -76,6 +83,12 @@ class ConfigManager:
         except (ValueError, KeyError):
             print(f'Fail to parse threshold. Raw value: {v}.')
         return 0.1, 0.1
+
+    def save_current_cfg(self):
+        with open(self.config_path, 'r') as f:
+            configs = yaml.safe_load(f)
+            with open(self.prev_config_path, 'w') as pf:
+                yaml.dump(configs, pf)
 
 
 def get_all_txt_files(data_dir: Path):
