@@ -13,6 +13,8 @@ class SheetManager:
         self.quant_key = 'Quantification w IS,ES'
         self.external_standard_key = 'EXT_STD'
         self.concentration_key = 'Corrected Concentration'
+        self.titer_key = 'Titer (mg_L)'
+        self.titer_mol_key = 'Titer (uM)'
         self.wb = openpyxl.Workbook()
 
     def create(self):
@@ -20,6 +22,8 @@ class SheetManager:
         self.wb.create_sheet(title=self.quant_key)
         self.wb.create_sheet(title=self.external_standard_key)
         self.wb.create_sheet(title=self.concentration_key)
+        self.wb.create_sheet(title=self.titer_key)
+        self.wb.create_sheet(title=self.titer_mol_key)
         del self.wb['Sheet']
 
     def load_raw_sheet(self):
@@ -39,6 +43,9 @@ class SheetManager:
 
     def load_quant_sheet(self):
         return self.wb[self.quant_key]
+
+    def load_titer_sheet(self):
+        return self.wb[self.titer_key]
 
     def write_raw_data_points(self, dp_dict: Dict[str, List[DataPoint]], vials: List[str]):
         sheet = self.load_raw_sheet()

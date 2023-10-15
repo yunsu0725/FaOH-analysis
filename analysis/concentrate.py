@@ -4,6 +4,7 @@ import numpy as np
 import math
 from analysis.sheet_manager import SheetManager
 from openpyxl.utils.dataframe import dataframe_to_rows
+from string import ascii_uppercase
 
 
 def calc_area_conc_scale(sheet_manager: SheetManager):
@@ -98,24 +99,97 @@ def calc_and_concentrate_data(sheet_manager: SheetManager, int_std_conc: dict):
     concData = pd.DataFrame(concDataDict)
     excelData = pd.concat([orig, concData], axis=1)
 
+    res = []
+    aggregator = DataAggregator()
     # write to the workbook
     rows = dataframe_to_rows(excelData)
-    sheet = sheet_manager.load_concentration_sheet()
+    base, sample = None, None
     for r in rows:
         if r[0] is None:
             # only append data
             continue
         label = r[1]
-        if re.match(r'C\d+$', label) and is_internal_condition(label):
-            # The regular expression matches labels like C1, C2,...,CN where N is a nature number
-            # So it captures those chain labels here.
-            # Moreover, we'd like to ignore those internal standard conc
-            # since there are no meaningful corrected concentration values for them
-            continue
+        if re.match(r'C\d+$', label):
+            if is_internal_condition(label):
+                # The regular expression matches labels like C1, C2,...,CN where N is a nature number
+                # So it captures those chain labels here.
+                # Moreover, we'd like to ignore those internal standard conc
+                # since there are no meaningful corrected concentration values for them
+                continue
+            elif sample is not None:
+                print(f'{base=} {sample=}, {r[1:]}')
+                aggregator.add_data(base, sample, r[1:])
         elif label == 'Peak_ID':
             # TODO: refactor here, it's just a workaround to label the header
             r[2] = 'Corrected Concentration'
-        # omit the row index, which locates in r[0]
-        sheet.append(r[1:])
+        else:
+            base, sample = split_sample_label(label)
 
-    sheet_manager.save_workbook()
+        # omit the row index, which locates in r[0]
+        res.append(r[1:])
+    print(f'{aggregator.data=}')
+    print(f'{aggregator.get_repeats()=}')
+    aggregator.output_to_sheet(sheet_manager)
+    return res
+
+
+class DataAggregator:
+    def __init__(self):
+        self.data = {}
+        self.columns = [
+            'C4', 'C6', 'C8', 'C10', 'C12', 'C14', 'C16', 'C18'
+        ]
+        self.sample_labels = list(ascii_uppercase)
+
+    def add_data(self, base: str, sample: str, c):
+        if len(c) != 2:
+            print(f"error, {c=}")
+            return
+
+        key, value = c[0], c[1]
+        if base not in self.data:
+            self.data[base] = {}
+        if sample not in self.data[base]:
+            self.data[base][sample] = {}
+        self.data[base][sample][key] = value
+
+    def get_repeats(self):
+        repeat_labels = set()
+        for baseData in self.data.values():
+            for label in baseData.keys():
+                repeat_labels.add(label)
+        print(f'{repeat_labels=}')
+        return len(repeat_labels)
+
+    def get_sample_value(self, base, sample, c_key):
+        if base not in self.data:
+            return None
+        if sample not in self.data[base]:
+            return None
+        if c_key not in self.data[base][sample]:
+            return None
+        return self.data[base][sample][c_key]
+
+    def output_to_sheet(self, sheet_manager: SheetManager):
+        col_num = self.get_repeats()
+        sheet = sheet_manager.load_titer_sheet()
+        header = ['']
+        for c in self.columns:
+            header = header + [c] + [''] * (col_num-1)
+        sheet.append(header)
+
+        for base in self.data.keys():
+            row = [base]
+            for c_key in self.columns:
+                for i in range(col_num):
+                    sample = self.sample_labels[i]
+                    data = self.get_sample_value(base, sample, c_key)
+                    row.append(data)
+            sheet.append(row)
+        sheet_manager.save_workbook()
+
+
+def split_sample_label(orig_label: str):
+    if orig_label[-2] != "-" or not orig_label[-1].isalpha():
+        return orig_label, None
+    return orig_label[:-2], orig_label[-1]
