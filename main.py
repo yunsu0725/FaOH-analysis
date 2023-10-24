@@ -66,7 +66,12 @@ def process(data_dir: str):
     sheet_manager.write_ext_std_sheet(x, conc_num)
     sheet_manager.save_workbook()
     int_std_conc = configManager.get_internal_std_conc()
-    calc_and_concentrate_data(sheet_manager, int_std_conc)
+    concentrate_data = calc_and_concentrate_data(sheet_manager, int_std_conc)
+    sheet = sheet_manager.load_concentration_sheet()
+    for d in concentrate_data:
+        sheet.append(d)
+    sheet_manager.save_workbook()
+    configManager.save_current_cfg()
 
 
 if __name__ == '__main__':
