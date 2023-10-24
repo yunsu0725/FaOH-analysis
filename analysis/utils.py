@@ -34,8 +34,11 @@ class ConfigManager:
 
     def _create_config_file(self):
         prev_cfg = None
-        with open(self.prev_config_path, 'r') as f:
-            prev_cfg = yaml.safe_load(f)
+        try:
+            with open(self.prev_config_path, 'r') as f:
+                prev_cfg = yaml.safe_load(f)
+        except FileNotFoundError:
+            pass
 
         with open(self.config_path, 'w') as f:
             template = {
