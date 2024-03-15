@@ -227,6 +227,8 @@ class DataAggregator:
 
 
 def split_sample_label(orig_label: str):
+    if "-" not in orig_label:
+        return orig_label, "A"
     if orig_label[-2] != "-" or not orig_label[-1].isalpha():
         return orig_label, None
     return orig_label[:-2], orig_label[-1]
